@@ -77,10 +77,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://internship-platform-4u0apgqab-hari-r31s-projects.vercel.app",
-]
+
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in config('CORS_ALLOWED_ORIGINS', default='').split(',') if origin]
+
 
 
 REST_FRAMEWORK = {
