@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "nodenext",           // required for moduleResolution: nodenext
-    "moduleResolution": "nodenext", // resolves modern ESM packages
+    "module": "ESNext",
+    "moduleResolution": "bundler",   // let Vite handle imports
     "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
-    "allowJs": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
