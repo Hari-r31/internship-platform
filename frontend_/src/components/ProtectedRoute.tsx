@@ -1,22 +1,24 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import React from "react";
 
 interface ProtectedRouteProps {
-  children: JSX.Element;
+  children: React.ReactNode;
   allowedRoles?: string[]; // now supports multiple roles
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user } = useAuth();
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
 
-  // Not logged in → redirect to login
+  // If not logged in, redirect to login
   if (!token) return <Navigate to="/login" replace />;
 
-  // Role restricted → redirect to home if user's role not in allowed list
-  if (allowedRoles && !allowedRoles.includes(user?.profile.role)) {
+  // If role restricted, check role safely
+  const userRole = user?.profile?.role; // safe access
+  if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
     return <Navigate to="/" replace />;
   }
 
-  return children;
+  return <>{children}</>; // wrap children in fragment for JSX safety
 }

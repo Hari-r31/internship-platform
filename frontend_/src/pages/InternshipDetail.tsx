@@ -50,7 +50,7 @@ export default function InternshipDetail() {
 
   const handleApply = async () => {
     try {
-      await api.post(`/applications/apply/${internship.id}`, {});
+      await api.post(`/applications/apply/${internship.id}/`, {});
       alert("Application submitted successfully!");
       setAlreadyApplied(true);
     } catch (error: any) {

@@ -1,32 +1,31 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
+import InternshipCard from "../components/RecrutierPostedListcard";
+import api from "../services/api";
+import type { Internship } from "../hooks/types";
 
 export default function RecruiterPostedList() {
   const { user, loading: authLoading } = useAuth();
-  const [internships, setInternships] = useState([]);
+  const [internships, setInternships] = useState<Internship[]>([]);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchInternships = async () => {
       try {
-          const { data } = await api.get("/internships/mine/");
-          console.log("Fetched posted jobs:", data);
-          if (data && Array.isArray(data.results)) {
-            setInternships(data.results);
-          } else if (Array.isArray(data)) {
-            setInternships(data);
-          } else {
-            setInternships([]);
-          }
-        } catch (_) {
-          setError("Unable to fetch applications.");
-        } finally {
-          setError(false);
+        const { data } = await api.get<{ results?: Internship[] }>("/internships/mine/");
+        console.log("Fetched posted jobs:", data);
+
+        if (data.results && Array.isArray(data.results)) {
+          setInternships(data.results);
+        } else if (Array.isArray(data)) {
+          setInternships(data);
+        } else {
+          setInternships([]);
         }
+      } catch (_) {
+        setError("Unable to fetch internships.");
+      }
     };
 
     if (!authLoading && user?.profile?.role === "recruiter") {
@@ -64,25 +63,10 @@ export default function RecruiterPostedList() {
         ) : (
           <div
             className="grid gap-6"
-            style={{
-              gridTemplateColumns: "repeat(auto-fit, minmax(345px, 1fr))",
-            }}
+            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(345px, 1fr))" }}
           >
-            {internships.map((job: any) => (
-              <div
-                key={job.id}
-                onClick={() => navigate(`/internships/${job.id}/view`)}
-                className="cursor-pointer bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition"
-              >
-                <h2 className="text-xl font-semibold mb-1">{job.title}</h2>
-                <p className="text-sm text-gray-300 mb-1">
-                  {job.company} • {job.location}
-                </p>
-                <p className="text-sm text-gray-400 mb-2">
-                  {job.internship_type} • ₹{job.stipend}
-                </p>
-                <p className="text-sm text-gray-500">Status: {job.status}</p>
-              </div>
+            {internships.map((job) => (
+              <InternshipCard key={job.id} internship={job} />
             ))}
           </div>
         )}

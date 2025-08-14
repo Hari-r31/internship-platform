@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);

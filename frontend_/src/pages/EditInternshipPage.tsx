@@ -5,7 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 
 export default function EditInternshipPage() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -43,6 +43,9 @@ export default function EditInternshipPage() {
         setError("Failed to load internship.");
       } finally {
         setLoading(false);
+        if (loading) {
+          console.log("Data is loading...");
+        }
       }
     };
 

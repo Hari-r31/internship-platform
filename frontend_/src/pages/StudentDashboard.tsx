@@ -3,32 +3,40 @@ import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 import ApplicationCard from "../components/ApplicationCard";
 import api from "../services/api";
+import type { Application } from "../hooks/types";
+
+// Define the API response type
+interface ApplicationsResponse {
+  results?: Application[];
+}
 
 export default function StudentDashboard() {
   const { user, loading } = useAuth();
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!loading && user?.profile?.role === "student") {
       const fetchApplications = async () => {
-  try {
-    const { data } = await api.get("/applications/mine/");
-    if (Array.isArray(data)) {
-      setApplications(data);
-    } else {
-      setApplications([]);
-    }
-  } catch (err) {
-    setError("Unable to fetch applications.");
-  } finally {
-    setFetching(false);
-  }
-};
+        try {
+          // Tell TS the response type
+          const { data } = await api.get<ApplicationsResponse>("/applications/mine/");
+          if (data.results && Array.isArray(data.results)) {
+            setApplications(data.results);
+          } else if (Array.isArray(data)) {
+            setApplications(data as Application[]);
+          } else {
+            setApplications([]);
+          }
+        } catch (err) {
+          setError("Unable to fetch applications.");
+        } finally {
+          setFetching(false);
+        }
+      };
 
-
-      fetchApplications().finally(() => setFetching(false));
+      fetchApplications();
     }
   }, [loading, user]);
 
@@ -62,8 +70,8 @@ export default function StudentDashboard() {
           <p className="text-gray-400">You have not applied to any internships yet.</p>
         ) : (
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {applications.map((app: any) => (
-              <ApplicationCard key={app.id} app={app} />
+            {applications.map((app) => (
+              <ApplicationCard key={app.id} application={app} />
             ))}
           </div>
         )}

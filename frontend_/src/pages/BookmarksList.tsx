@@ -5,7 +5,7 @@ import BookmarkCard from "../components/BookmarkCard";
 import api from "../services/api";
 
 export default function Bookmarks() {
-  const { user, loading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuth();
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

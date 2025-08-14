@@ -3,10 +3,11 @@ import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 import ApplicationCard from "../components/ApplicationCard";
 import api from "../services/api";
+import type { Application } from "../hooks/types"; // define type separately
 
 export default function StudentApplications() {
   const { user, loading: authLoading } = useAuth();
-  const [applications, setApplications] = useState([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
 
@@ -14,9 +15,10 @@ export default function StudentApplications() {
     if (!authLoading && user?.profile?.role === "student") {
       const fetchApplications = async () => {
         try {
-          const { data } = await api.get("/applications/mine/");
+          const { data } = await api.get<{ results?: Application[] }>("/applications/mine/");
           console.log("Fetched applications:", data);
-          if (data && Array.isArray(data.results)) {
+
+          if (data.results && Array.isArray(data.results)) {
             setApplications(data.results);
           } else if (Array.isArray(data)) {
             setApplications(data);
@@ -28,7 +30,6 @@ export default function StudentApplications() {
         } finally {
           setFetching(false);
         }
-
       };
 
       fetchApplications();
@@ -66,12 +67,10 @@ export default function StudentApplications() {
         ) : (
           <div
             className="grid gap-6"
-            style={{
-              gridTemplateColumns: "repeat(auto-fit, minmax(345px, 1fr))",
-            }}
+            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(345px, 1fr))" }}
           >
-            {applications.map((app: any) => (
-              <ApplicationCard key={app.id} app={app} />
+            {applications.map((application) => (
+              <ApplicationCard key={application.id} application={application} />
             ))}
           </div>
         )}

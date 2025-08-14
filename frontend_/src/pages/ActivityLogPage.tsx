@@ -3,10 +3,12 @@ import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 import ActivityLogCard from "../components/ActivityLogCard";
 import api from "../services/api";
+import type { ActivityLog } from "../hooks/types"; // typed import
 
 export default function ActivityLogPage() {
   const { user, loading: authLoading } = useAuth();
-  const [logs, setLogs] = useState([]);
+
+  const [logs, setLogs] = useState<ActivityLog[]>([]); // typed state
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
 
@@ -14,17 +16,18 @@ export default function ActivityLogPage() {
     if (!authLoading && user) {
       const fetchLogs = async () => {
         try {
-          const { data } = await api.get("/activity_logs/");
+          const { data } = await api.get<{ results?: ActivityLog[] }>("/activity_logs/");
           console.log("Fetched activity_logs:", data);
-          if (data && Array.isArray(data.results)) {
+
+          if (data.results && Array.isArray(data.results)) {
             setLogs(data.results);
           } else if (Array.isArray(data)) {
             setLogs(data);
           } else {
             setLogs([]);
           }
-        } catch (_) {
-          setError("Unable to fetch applications.");
+        } catch {
+          setError("Unable to fetch activity logs.");
         } finally {
           setFetching(false);
         }
@@ -57,11 +60,9 @@ export default function ActivityLogPage() {
         ) : (
           <div
             className="grid gap-6"
-            style={{
-              gridTemplateColumns: "repeat(auto-fit, minmax(345px, 1fr))",
-            }}
+            style={{ gridTemplateColumns: "repeat(auto-fit, minmax(345px, 1fr))" }}
           >
-            {logs.map((log: any) => (
+            {logs.map((log) => (
               <ActivityLogCard key={log.id} log={log} />
             ))}
           </div>
