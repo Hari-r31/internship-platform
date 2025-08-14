@@ -22,17 +22,19 @@ export default function InternshipDetail() {
   useEffect(() => {
   const fetchData = async () => {
     try {
-      // Fetch all in parallel
-      const [internshipRes, applyCheck, bookmarkCheck] = await Promise.all([
-        api.get(`/internships/${id}/view/`),
-        api.get(`/applications/check/${id}/`),
-        api.get(`/bookmarks/check/${id}/`)
-      ]);
-
+      // Fetch internship info (publicly viewable)
+      const internshipRes = await api.get(`/internships/${id}/view/`);
       setInternship(internshipRes.data);
-      setAlreadyApplied(applyCheck.data.applied);
-      setBookmarked(bookmarkCheck.data.bookmarked);
 
+      // Only check application/bookmark if user is authenticated
+      if (user) {
+        const [applyCheck, bookmarkCheck] = await Promise.all([
+          api.get(`/applications/check/${id}/`),
+          api.get(`/bookmarks/check/${id}/`)
+        ]);
+        setAlreadyApplied(applyCheck.data.applied);
+        setBookmarked(bookmarkCheck.data.bookmarked);
+      }
     } catch (_) {
       setError("Failed to load internship.");
     } finally {
@@ -41,7 +43,8 @@ export default function InternshipDetail() {
   };
 
   fetchData();
-}, [id]);
+}, [id, user]);
+
 
 
   const handleDelete = async () => {
