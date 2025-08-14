@@ -100,7 +100,7 @@ export default function EditInternshipPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white font-sans">
       <Navbar /> {/* Navbar added */}
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
