@@ -26,6 +26,7 @@ export default function ProfilePage() {
       try {
         const data = await getMe();
         setUserData(data);
+        console.log("User data:", data);
         setForm({
           username: data.username,
           email: data.email,
@@ -45,14 +46,13 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
-
   const handleUpdate = async () => {
     try {
       await patchMeUser({
         username: form.username,
         email: form.email,
       });
-      
+
       await patchMeProfile({
         first_name: form.first_name,
         last_name: form.last_name,
@@ -60,10 +60,9 @@ export default function ProfilePage() {
         location: form.location,
         profile_picture: form.profile_picture,
       });
-      
 
       await refreshMe();
-      
+
       const updated = await getMe();
       setUserData(updated);
       setEditing(false);
@@ -79,7 +78,6 @@ export default function ProfilePage() {
       </div>
     );
   }
-  console.log(userData);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white font-sans">
@@ -94,8 +92,8 @@ export default function ProfilePage() {
             <div className="flex items-center gap-6 mb-6">
               <img
                 src={
-                    userData?.profile?.profile_picture
-                    ? `${BASE_URL}${userData.profile.profile_picture}`
+                  userData?.profile?.profile_picture_url
+                    ? userData.profile.profile_picture_url
                     : "/default-avatar.png"
                 }
                 alt="Profile"
@@ -107,11 +105,26 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 text-sm text-gray-300">
-              <p><span className="font-semibold text-white">First Name:</span> {userData?.profile?.first_name || "—"}</p>
-              <p><span className="font-semibold text-white">Last Name:</span> {userData?.profile?.last_name || "—"}</p>
-              <p><span className="font-semibold text-white">Location:</span> {userData?.profile?.location || "—"}</p>
-              <p><span className="font-semibold text-white">Role:</span> {userData?.profile?.role}</p>
-              <p className="col-span-2"><span className="font-semibold text-white">Bio:</span> {userData?.profile?.bio || "—"}</p>
+              <p>
+                <span className="font-semibold text-white">First Name:</span>{" "}
+                {userData?.profile?.first_name || "—"}
+              </p>
+              <p>
+                <span className="font-semibold text-white">Last Name:</span>{" "}
+                {userData?.profile?.last_name || "—"}
+              </p>
+              <p>
+                <span className="font-semibold text-white">Location:</span>{" "}
+                {userData?.profile?.location || "—"}
+              </p>
+              <p>
+                <span className="font-semibold text-white">Role:</span>{" "}
+                {userData?.profile?.role}
+              </p>
+              <p className="col-span-2">
+                <span className="font-semibold text-white">Bio:</span>{" "}
+                {userData?.profile?.bio || "—"}
+              </p>
             </div>
             <button
               onClick={() => setEditing(true)}
@@ -127,7 +140,9 @@ export default function ProfilePage() {
                 type="text"
                 placeholder="Username"
                 value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, username: e.target.value })
+                }
                 className="bg-gray-700 text-white px-4 py-2 rounded"
               />
               <input
@@ -141,28 +156,37 @@ export default function ProfilePage() {
                 type="text"
                 placeholder="First Name"
                 value={form.first_name}
-                onChange={(e) => setForm({ ...form, first_name: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, first_name: e.target.value })
+                }
                 className="bg-gray-700 text-white px-4 py-2 rounded"
               />
               <input
                 type="text"
                 placeholder="Last Name"
                 value={form.last_name}
-                onChange={(e) => setForm({ ...form, last_name: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, last_name: e.target.value })
+                }
                 className="bg-gray-700 text-white px-4 py-2 rounded"
               />
               <input
                 type="text"
                 placeholder="Location"
                 value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, location: e.target.value })
+                }
                 className="bg-gray-700 text-white px-4 py-2 rounded"
               />
               <input
                 type="file"
                 accept="image/*"
                 onChange={(e) =>
-                  setForm({ ...form, profile_picture: e.target.files?.[0] || null })
+                  setForm({
+                    ...form,
+                    profile_picture: e.target.files?.[0] || null,
+                  })
                 }
                 className="bg-gray-700 text-white px-4 py-2 rounded"
               />
