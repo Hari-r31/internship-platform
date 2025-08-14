@@ -19,7 +19,7 @@ class Profile(models.Model):
     profile_picture_url = models.URLField(blank=True, null=True)
     bio = models.TextField(blank=True)
     location = models.CharField(max_length=255, blank=True)
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='student')
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
