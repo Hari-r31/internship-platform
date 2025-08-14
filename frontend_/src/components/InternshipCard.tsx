@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../contexts/AuthContext"; // import auth context
 
 type Props = {
   internship: {
@@ -11,6 +12,7 @@ type Props = {
     type: string;
     duration: string;
     description: string;
+    bookmarked?: boolean; // optional, in case not provided
   };
 };
 
@@ -25,7 +27,9 @@ export default function InternshipCard({ internship }: Props) {
     description,
   } = internship;
 
-  const [bookmarked, setBookmarked] = useState(false);
+  const { user } = useAuth(); // get logged in user
+  const [bookmarked, setBookmarked] = useState(internship.bookmarked ?? false);
+
 
   const shortDesc =
     description.length > 170 ? description.slice(0, 167) + "..." : description;
@@ -46,13 +50,17 @@ export default function InternshipCard({ internship }: Props) {
 
   return (
     <div className="relative bg-gray-900 rounded-xl shadow-lg p-6 text-white hover:scale-[1.02] transition transform">
-      <button
-        onClick={toggleBookmark}
-        className="absolute top-4 right-4 text-yellow-400 hover:text-yellow-300 text-xl"
-        title={bookmarked ? "Remove Bookmark" : "Add Bookmark"}
-      >
-        {bookmarked ? "★" : "☆"}
-      </button>
+      {/* ✅ Only show bookmark button if logged in as student */}
+      {user?.profile?.role === "student" && (
+        <button
+          onClick={toggleBookmark}
+          className="absolute top-4 right-4 text-yellow-400 hover:text-yellow-300 text-xl"
+          title={bookmarked ? "Remove Bookmark" : "Add Bookmark"}
+        >
+          {bookmarked ? "★" : "☆"}
+        </button>
+      )}
+
       <h3 className="text-xl font-semibold mb-1">{title}</h3>
       <p className="text-sm text-gray-300 mb-2">{company} • {location}</p>
       <p className="text-sm text-gray-400 mb-2">{type} • {duration}</p>

@@ -5,11 +5,13 @@ import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 
 export default function PostInternship() {
-  const { user, loading } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const { loading, user } = useAuth();
   const navigate = useNavigate();
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  
 
   const [form, setForm] = useState({
     title: "",
@@ -29,17 +31,22 @@ export default function PostInternship() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
-    setError("");
-    setSuccess(false);
-    try {
-      await api.post("/internships/create/", form);
-      setSuccess(true);
-      setTimeout(() => navigate("/internships/mine/"), 1500);
-    } catch (err: any) {
-      setError(err?.response?.data?.detail || "Failed to post internship.");
-    }
-  };
+const handleSubmit = async () => {
+  setError("");
+  setSuccess(false);
+  setSubmitting(true);
+  try {
+    await api.post("/internships/create/", form);
+    setSuccess(true);
+    setTimeout(() => navigate("/internships/mine/"), 1500);
+  } catch (err: any) {
+    setError(err?.response?.data?.detail || "Failed to post internship.");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
 
   // Loading state
   if (loading) {
@@ -156,10 +163,15 @@ export default function PostInternship() {
 
         <button
           onClick={handleSubmit}
-          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
+          disabled={submitting}
+          className={`mt-6 px-6 py-2 rounded text-white transition-colors ${
+            submitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+          }`}
         >
-          Post Internship
+          {submitting ? "Posting!" : "Post Internship"}
         </button>
+
+
       </div>
 
       <footer className="text-center py-6 text-sm text-gray-500">

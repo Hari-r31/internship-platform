@@ -93,6 +93,40 @@ class UserUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# views.py
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from django.contrib.auth import update_session_auth_hash
+from .serializers import ChangePasswordSerializer
+
+class ChangePasswordView(generics.UpdateAPIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        user = self.get_object()
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            # Check old password
+            if not user.check_password(serializer.validated_data['old_password']):
+                return Response({"old_password": ["Wrong password."]}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Set new password
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+
+            # Keep the user logged in
+            update_session_auth_hash(request, user)
+
+            return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 # --------------------------
 # INTERNSHIP VIEWS
 # --------------------------
@@ -110,6 +144,13 @@ class InternshipListView(generics.ListAPIView):
     }
     search_fields = ['title', 'description', 'location', 'company', 'internship_type']
     ordering_fields = ['posted_on', 'stipend']
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
+
 
 
 class InternshipCreateView(generics.CreateAPIView):

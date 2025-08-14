@@ -8,7 +8,7 @@ import { login as loginApi, getMe } from '../services/auth';
 type UserProfile = {
   first_name: string | null;
   last_name: string | null;
-  profile_picture: string | null;
+  profile_picture_url: string | null;
   bio: string;
   location: string;
   role: 'student' | 'recruiter' | string;

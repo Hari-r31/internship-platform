@@ -26,12 +26,12 @@ SECRET_KEY = config('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = [
     "internship-platform-drbd.onrender.com",  # Render backend
-    "localhost",                              # local dev
-    "127.0.0.1",                              # local dev via IP
+    "http://localhost:5173",
+    "127.0.0.1",
 ]
 
 

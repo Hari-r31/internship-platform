@@ -26,6 +26,7 @@ import ApplicantsListPage from "./pages/ApplicantsListPage";
 // Shared protected pages
 import ActivityLogPage from "./pages/ActivityLogPage";
 import ProfilePage from "./pages/ProfilePage";
+import ChangePassword from "./pages/ChangePassword";
 
 // Internship-related pages
 import InternshipList from "./pages/InternshipsList";
@@ -61,6 +62,7 @@ function App() {
         {/* Shared protected routes (student + recruiter) */}
         <Route path="/activity_logs/" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ActivityLogPage /></ProtectedRoute>} />
         <Route path="/me/profile/" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ProfilePage /></ProtectedRoute>} />
+        <Route path="/me/change-password" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ChangePassword /></ProtectedRoute>} />
 
         {/* Catch-all */}
         <Route path="*" element={<NotFound />} />

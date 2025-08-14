@@ -19,7 +19,11 @@ export default function RegisterPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const [loading, setLoading] = useState(false); // add this
+
   const handleSubmit = async () => {
+    setLoading(true); // start loading
+    setError("");     // clear previous errors
     try {
       await api.post("/register/", {
         username: form.username,
@@ -31,8 +35,11 @@ export default function RegisterPage() {
       setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
       setError(err?.response?.data?.detail || "Registration failed.");
+    } finally {
+      setLoading(false); // stop loading
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col">
@@ -84,10 +91,19 @@ export default function RegisterPage() {
 
           <button
             onClick={handleSubmit}
-            className="mt-6 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            disabled={loading}
+            className={`mt-6 w-full text-white px-4 py-2 rounded transition ${
+              loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Register
+            {loading ? "Registering!" : "Register"}
           </button>
+          <button
+          onClick={() => navigate("/login")}
+          className="mt-4 w-full bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600 transition"
+        >
+          Already have an account? Login
+        </button>
         </div>
       </div>
     </div>

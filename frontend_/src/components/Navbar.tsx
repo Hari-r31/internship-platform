@@ -20,9 +20,9 @@ export default function Navbar() {
 
   const commonLinks = (
     <>
-      <a href="/For-Students" className="hover:text-blue-600">Student Opportunities</a>
-      <a href="/For-Companies" className="hover:text-blue-600">Hire Engineers</a>
-            <a href="/How-It-Works" className="hover:text-blue-600">Platform Overview</a>
+      <a href="/For-Students/" className="hover:text-blue-600">Student Opportunities</a>
+      <a href="/For-Companies/" className="hover:text-blue-600">Hire Engineers</a>
+      <a href="/How-It-Works/" className="hover:text-blue-600">Platform Overview</a>
     </>
   );
 
@@ -72,11 +72,24 @@ export default function Navbar() {
             {user ? (
               <div className="relative">
                 <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="text-base font-medium hover:text-blue-600"
-                >
-                  Profile
-                </button>
+  onClick={() => setShowProfileMenu(!showProfileMenu)}
+  className="flex flex-col items-center gap-1"
+>
+  <img
+    src={
+      user?.profile?.profile_picture_url
+        ? user.profile.profile_picture_url
+        : "/default-avatar.png"
+    }
+    alt="Profile"
+    className="w-8 h-8 rounded-full object-cover border border-gray-300"
+  />
+
+  <span className="text-xs font-medium hover:text-blue-600">
+  </span>
+</button>
+
+
                 {showProfileMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-transparent border rounded shadow-lg py-1 z-50">
                   <Link
@@ -85,6 +98,13 @@ export default function Navbar() {
                   >
                     Account Settings
                   </Link>
+                  <Link
+  to="/me/change-password"
+  className="block px-4 py-2 text-base hover:bg-gray-100 hover:text-black"
+>
+  Change Password
+</Link>
+
                   <button
                     onClick={logout}
                     className="w-full text-left px-4 py-2 text-base hover:bg-gray-100 hover:text-black"

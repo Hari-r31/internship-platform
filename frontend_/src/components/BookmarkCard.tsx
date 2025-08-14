@@ -1,11 +1,12 @@
-
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import { useAuth } from "../contexts/AuthContext"; // ✅ adjust path to your AuthContext
 
 type Props = {
   bookmark: {
     id: number;
-    internship: number; // only ID is provided
+    internship: number;
     internship_title: string;
     internship_company: string;
     internship_location?: string;
@@ -24,12 +25,18 @@ export default function BookmarkCard({ bookmark, onRemove }: Props) {
     bookmarked_on,
   } = bookmark;
 
+  const [removing, setRemoving] = useState(false);
+  const { user } = useAuth(); // ✅ contains role, username, etc.
+
   const handleRemove = async () => {
+    setRemoving(true);
     try {
       await api.delete(`/bookmarks/${internship}/remove/`);
       onRemove(id);
     } catch (_) {
       alert("Failed to remove bookmark.");
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -54,12 +61,21 @@ export default function BookmarkCard({ bookmark, onRemove }: Props) {
         >
           View Details
         </Link>
-        <button
-          onClick={handleRemove}
-          className="text-sm text-red-400 hover:text-red-300 px-3 py-1"
-        >
-          Remove
-        </button>
+
+        {/* ✅ Show remove button only if role is student */}
+        {user?.profile.role === "student" && (
+          <button
+            onClick={handleRemove}
+            disabled={removing}
+            className={`text-sm px-3 py-1 rounded ${
+              removing
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-red-400 hover:text-red-300"
+            }`}
+          >
+            {removing ? "Removing..." : "Remove"}
+          </button>
+        )}
       </div>
     </div>
   );

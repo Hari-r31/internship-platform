@@ -1,45 +1,55 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import Navbar from "../components/Navbar";
 
 export default function InternshipDetail() {
+  const [submitting, setSubmitting] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [internship, setInternship] = useState<any>(null);
+  const location = useLocation();
+
+  const [internship, setInternship] = useState<any>(location.state || null);
   const [error, setError] = useState("");
   const [alreadyApplied, setAlreadyApplied] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
 
   useEffect(() => {
-    const fetchInternship = async () => {
-      try {
-        const { data } = await api.get(`/internships/${id}/view/`);
-        setInternship(data);
+  const fetchData = async () => {
+    try {
+      // Fetch all in parallel
+      const [internshipRes, applyCheck, bookmarkCheck] = await Promise.all([
+        api.get(`/internships/${id}/view/`),
+        api.get(`/applications/check/${id}/`),
+        api.get(`/bookmarks/check/${id}/`)
+      ]);
 
-        // Check if already applied
-        const applyCheck = await api.get(`/applications/check/${id}/`);
-        setAlreadyApplied(applyCheck.data.applied);
+      setInternship(internshipRes.data);
+      setAlreadyApplied(applyCheck.data.applied);
+      setBookmarked(bookmarkCheck.data.bookmarked);
 
-        // Check if bookmarked
-        const bookmarkCheck = await api.get(`/bookmarks/check/${id}/`);
-        setBookmarked(bookmarkCheck.data.bookmarked);
-      } catch (_) {
-        setError("Failed to load internship.");
-      }
-    };
+    } catch (_) {
+      setError("Failed to load internship.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchInternship();
-  }, [id]);
+  fetchData();
+}, [id]);
+
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this internship?")) return;
     try {
       await api.delete(`/internships/${id}/edit/`);
       navigate("/internships/mine");
-    } catch (_) {
+    } catch {
       alert("Failed to delete internship.");
     }
   };
@@ -49,9 +59,9 @@ export default function InternshipDetail() {
   };
 
   const handleApply = async () => {
+    setSubmitting(true);
     try {
       await api.post(`/applications/apply/${internship.id}/`, {});
-      alert("Application submitted successfully!");
       setAlreadyApplied(true);
     } catch (error: any) {
       if (error.response?.data) {
@@ -59,25 +69,52 @@ export default function InternshipDetail() {
       } else {
         alert("Failed to submit application.");
       }
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const toggleBookmark = async () => {
+    // Optimistic update
+    setBookmarked((prev) => !prev);
+    setBookmarkLoading(true);
+
     try {
       if (bookmarked) {
         await api.delete(`/bookmarks/${internship.id}/remove/`);
-        setBookmarked(false);
       } else {
         await api.post(`/bookmarks/${internship.id}/add/`);
-        setBookmarked(true);
       }
-    } catch (_) {
+    } catch {
       alert("Failed to update bookmark.");
+      setBookmarked((prev) => !prev); // revert if fail
+    } finally {
+      setBookmarkLoading(false);
     }
   };
 
+  if (loading && !internship) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white">
+        <Navbar />
+        <div className="max-w-3xl mx-auto p-6 animate-pulse">
+          <div className="h-6 bg-gray-700 rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-gray-700 rounded w-1/4 mb-2"></div>
+          <div className="h-4 bg-gray-700 rounded w-1/5 mb-2"></div>
+          <div className="h-4 bg-gray-700 rounded w-2/3 mb-6"></div>
+          <div className="h-24 bg-gray-700 rounded mb-4"></div>
+          <div className="h-10 bg-gray-800 rounded w-32"></div>
+        </div>
+      </div>
+    );
+  }
+
   if (!internship) {
-    return <div className="h-screen flex items-center justify-center text-white">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex items-center justify-center">
+        {error || "Internship not found."}
+      </div>
+    );
   }
 
   const isOwner = user?.id === internship.recruiter;
@@ -95,7 +132,6 @@ export default function InternshipDetail() {
         </button>
 
         <h1 className="text-3xl font-bold mb-4">{internship.title}</h1>
-
         <p className="text-gray-300 mb-2"><strong>Company:</strong> {internship.company}</p>
         <p className="text-gray-300 mb-2"><strong>Location:</strong> {internship.location}</p>
         <p className="text-gray-400 mb-2"><strong>Type:</strong> {internship.internship_type}</p>
@@ -111,8 +147,12 @@ export default function InternshipDetail() {
 
         {internship.apply_link && (
           <p className="text-sm text-gray-400 mb-6">
-            <a href={internship.apply_link} target="_blank" rel="noopener noreferrer"
-              className="text-blue-400 underline hover:text-blue-500">
+            <a
+              href={internship.apply_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 underline hover:text-blue-500"
+            >
               External Apply Link
             </a>
           </p>
@@ -122,50 +162,60 @@ export default function InternshipDetail() {
           <div className="flex gap-4 mb-6">
             <button
               onClick={handleApply}
-              disabled={alreadyApplied}
-              className={`px-4 py-2 rounded ${alreadyApplied
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
+              disabled={alreadyApplied || submitting}
+              className={`px-4 py-2 rounded ${
+                alreadyApplied || submitting
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-blue-500 hover:bg-blue-600"
               }`}
             >
-              {alreadyApplied ? "Already Applied" : "Apply Now"}
+              {submitting
+                ? "Applying…"
+                : alreadyApplied
+                ? "Already Applied"
+                : "Apply Now"}
             </button>
 
             <button
               onClick={toggleBookmark}
-              className={`px-4 py-2 rounded ${bookmarked
-                ? "bg-yellow-500 hover:bg-yellow-600"
-                : "bg-gray-600 hover:bg-gray-700"
+              disabled={bookmarkLoading}
+              className={`px-4 py-2 rounded ${
+                bookmarked
+                  ? "bg-yellow-500 hover:bg-yellow-600"
+                  : "bg-gray-600 hover:bg-gray-700"
               }`}
             >
-              {bookmarked ? "Remove Bookmark" : "Bookmark"}
+              {bookmarkLoading
+                ? "Updating…"
+                : bookmarked
+                ? "Remove Bookmark"
+                : "Bookmark"}
             </button>
           </div>
         )}
 
         {isOwner && (
-  <div className="flex gap-4">
-    <button
-      onClick={handleEdit}
-      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-    >
-      Edit
-    </button>
-    <button
-      onClick={handleDelete}
-      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-    >
-      Delete
-    </button>
-    <button
-      onClick={() => navigate(`/internships/${internship.id}/applicants`)}
-      className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-    >
-      View Applicants
-    </button>
-  </div>
-)}
-
+          <div className="flex gap-4">
+            <button
+              onClick={handleEdit}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            >
+              Edit
+            </button>
+            <button
+              onClick={handleDelete}
+              className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => navigate(`/internships/${internship.id}/applicants`)}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              View Applicants
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

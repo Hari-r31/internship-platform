@@ -105,19 +105,44 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
         return user
 
+# serializers.py
+from rest_framework import serializers
+from django.contrib.auth.models import User
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+
+    def validate_new_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Password must be at least 8 characters long.")
+        return value
+
+
 # --------------------------
 # INTERNSHIP SERIALIZER
 # --------------------------
+from rest_framework import serializers
+from .models import Internship
+
 class InternshipSerializer(serializers.ModelSerializer):
     expiry_date = serializers.DateField(
         input_formats=['%Y-%m-%d', '%m/%d/%Y', '%d-%m-%Y'],
         required=False
     )
+    bookmarked = serializers.SerializerMethodField()
 
     class Meta:
         model = Internship
         fields = '__all__'
         read_only_fields = ['recruiter', 'date_posted']
+
+    def get_bookmarked(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated and user.profile.role == 'student':
+            return obj.bookmarked_by.filter(user=user).exists()
+        return False
+
 
 # --------------------------
 # APPLICATION SERIALIZERS

@@ -13,6 +13,8 @@ urlpatterns = [
     path('me/', UserProfileView.as_view(), name='user-profile'),      # Authenticated users
     path('me/profile/', ProfileUpdateView.as_view(), name='profile-update'), # Authenticated users (update profile)
     path('me/user/', UserUpdateView.as_view(), name='user-update'),   # Authenticated users (update user info)
+    path('me/change-password/', ChangePasswordView.as_view(), name='change-password'),
+
 
     # --------------------------
     # INTERNSHIPS
