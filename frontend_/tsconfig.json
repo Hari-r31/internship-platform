@@ -1,12 +1,13 @@
-
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "nodenext",           // required for moduleResolution: nodenext
+    "moduleResolution": "nodenext", // resolves modern ESM packages
     "jsx": "react-jsx",
     "strict": true,
-    "moduleResolution": "node",
     "esModuleInterop": true,
+    "allowJs": true,
     "skipLibCheck": true
-  }
+  },
+  "include": ["src"]
 }
