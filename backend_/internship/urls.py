@@ -1,6 +1,6 @@
+from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import *
-from django.urls import path, include
 
 router = DefaultRouter()
 
@@ -14,9 +14,8 @@ urlpatterns = [
     path('me/profile/', ProfileUpdateView.as_view(), name='profile-update'), # Authenticated users (update profile)
     path('me/user/', UserUpdateView.as_view(), name='user-update'),   # Authenticated users (update user info)
     path('me/change-password/', ChangePasswordView.as_view(), name='change-password'),
-    path("forgot-password/", forgot_password, name="forgot_password"),
-    path("reset-password/<int:uid>/<str:token>/", reset_password, name="reset_password"),
-
+    path('forgot-password/', forgot_password, name='forgot_password'),
+    path('reset-password/<int:uid>/<str:token>/', reset_password, name='reset_password'),
 
     # --------------------------
     # INTERNSHIPS
@@ -32,20 +31,20 @@ urlpatterns = [
     # --------------------------
     path('applications/apply/<int:internship_id>/', ApplyToInternshipView.as_view(), name='apply-to-internship'), # Authenticated students
     path('applications/mine/', StudentApplicationListView.as_view(), name='student-applications'),              # Authenticated students
-    path('internships/<int:internship_id>/applicants/', RecruiterApplicantListView.as_view(), name='recruiter-applicants'), # Authenticated recruiters (for their internships)
-    path('applications/<int:pk>/status/', ApplicationStatusUpdateView.as_view(), name='update-application-status'),      # Authenticated recruiters (for their internships)
+    path('internships/<int:internship_id>/applicants/', RecruiterApplicantListView.as_view(), name='recruiter-applicants'), # Authenticated recruiters
+    path('applications/<int:pk>/status/', ApplicationStatusUpdateView.as_view(), name='update-application-status'),      # Authenticated recruiters
     path('applications/check/<int:internship_id>/', ApplicationCheckView.as_view(), name='application-check'),          # Authenticated students
 
     # --------------------------
     # BOOKMARKS
     # --------------------------
-    path('bookmarks/<int:internship_id>/add/', BookmarkCreateView.as_view(), name='bookmark-add'),      # Authenticated users (any role)
-    path('bookmarks/<int:internship_id>/remove/', BookmarkDeleteView.as_view(), name='bookmark-remove'), # Authenticated users (any role)
-    path('bookmarks/list/', BookmarkListView.as_view(), name='bookmark-list'),                            # Authenticated users (any role)
-    path('bookmarks/check/<int:internship_id>/', BookmarkCheckView.as_view(), name='bookmark-check'),    # Authenticated users (any role)
+    path('bookmarks/<int:internship_id>/add/', BookmarkCreateView.as_view(), name='bookmark-add'),      # Authenticated users
+    path('bookmarks/<int:internship_id>/remove/', BookmarkDeleteView.as_view(), name='bookmark-remove'), # Authenticated users
+    path('bookmarks/list/', BookmarkListView.as_view(), name='bookmark-list'),                            # Authenticated users
+    path('bookmarks/check/<int:internship_id>/', BookmarkCheckView.as_view(), name='bookmark-check'),    # Authenticated users
 
     # --------------------------
     # ACTIVITY LOGS
     # --------------------------
-    path('activity_logs/', UserActivityLogListView.as_view(), name='user-activity-logs'), # Authenticated users (their own activity logs)
+    path('activity_logs/', UserActivityLogListView.as_view(), name='user-activity-logs'), # Authenticated users
 ]

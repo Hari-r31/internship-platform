@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Pages
+// Public Pages
 import Index from "./pages/Index";
 import Login from "./pages/auth/Login";
 import RegisterPage from "./pages/auth/RegisterPage";
@@ -12,26 +12,26 @@ import ForStudents from "./components/ForStudents";
 import ForCompanies from "./components/ForCompanies";
 import NotFound from "./pages/NotFound";
 
-// Student pages
+// Student Pages
 import Bookmarks from "./pages/BookmarksList";
 import StudentApplications from "./pages/ApplicationList";
 
-// Recruiter pages
-
+// Recruiter Pages
 import PostInternship from "./pages/PostInternship";
 import RecruiterPostedList from "./pages/RecrutierPostedList";
 import EditInternshipPage from "./pages/EditInternshipPage";
 import ApplicantsListPage from "./pages/ApplicantsListPage";
 
-// Shared protected pages
+// Shared Protected Pages
 import ActivityLogPage from "./pages/ActivityLogPage";
 import ProfilePage from "./pages/ProfilePage";
 import ChangePassword from "./pages/ChangePassword";
 
-// Internship-related pages
+// Internship-related Pages
 import InternshipList from "./pages/InternshipsList";
 import InternshipDetail from "./pages/InternshipDetail";
 
+// Password Reset Pages
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 
@@ -39,7 +39,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
+        {/* ---------------- PUBLIC ROUTES ---------------- */}
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -48,31 +48,30 @@ function App() {
         <Route path="/For-Companies" element={<ForCompanies />} />
         <Route path="/internships" element={<InternshipList />} />
         <Route path="/internships/:id/view" element={<InternshipDetail />} />
-
-        {/* Student-only routes */}
+        
+        {/* ---------------- STUDENT-ONLY ROUTES ---------------- */}
         <Route path="/bookmarks/list/" element={<ProtectedRoute allowedRoles={["student"]}><Bookmarks /></ProtectedRoute>} />
         <Route path="/applications/mine/" element={<ProtectedRoute allowedRoles={["student"]}><StudentApplications /></ProtectedRoute>} />
         <Route path="/applications/apply/" element={<InternshipDetail />} />
 
-
-        {/* Recruiter-only routes */}
+        {/* ---------------- RECRUITER-ONLY ROUTES ---------------- */}
         <Route path="/internships/create/" element={<ProtectedRoute allowedRoles={["recruiter"]}><PostInternship /></ProtectedRoute>} />
         <Route path="/internships/mine/" element={<ProtectedRoute allowedRoles={["recruiter"]}><RecruiterPostedList /></ProtectedRoute>} />
         <Route path="/internships/:id/edit/" element={<ProtectedRoute allowedRoles={["recruiter"]}><EditInternshipPage /></ProtectedRoute>} />
         <Route path="/internships/:internship_id/applicants" element={<ProtectedRoute allowedRoles={["recruiter"]}><ApplicantsListPage /></ProtectedRoute>} />
 
+        {/* ---------------- SHARED PROTECTED ROUTES ---------------- */}
+        <Route path="/activity_logs/" element={<ProtectedRoute allowedRoles={["student","recruiter"]}><ActivityLogPage /></ProtectedRoute>} />
+        <Route path="/me/profile/" element={<ProtectedRoute allowedRoles={["student","recruiter"]}><ProfilePage /></ProtectedRoute>} />
+        <Route path="/me/change-password" element={<ProtectedRoute allowedRoles={["student","recruiter"]}><ChangePassword /></ProtectedRoute>} />
 
-        {/* Shared protected routes (student + recruiter) */}
-        <Route path="/activity_logs/" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ActivityLogPage /></ProtectedRoute>} />
-        <Route path="/me/profile/" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ProfilePage /></ProtectedRoute>} />
-        <Route path="/me/change-password" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ChangePassword /></ProtectedRoute>} />
-        
-         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        {/* ---------------- PASSWORD RESET ---------------- */}
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
 
-        {/* Catch-all */}
+        {/* ---------------- CATCH-ALL ROUTE ---------------- */}
         <Route path="*" element={<NotFound />} />
-        
+
       </Routes>
     </BrowserRouter>
   );
