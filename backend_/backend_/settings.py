@@ -28,7 +28,12 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["internship-platform-drbd.onrender.com"]
+ALLOWED_HOSTS = [
+    "internship-platform-drbd.onrender.com",  # Render backend
+    "localhost",                              # local dev
+    "127.0.0.1",                              # local dev via IP
+]
+
 
 
 # Application definition
@@ -74,8 +79,9 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://internship-platform-iumd7mk0p-hari-r31s-projects.vercel.app/",
+    "https://internship-platform-iumd7mk0p-hari-r31s-projects.vercel.app",
 ]
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
