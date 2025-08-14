@@ -4,17 +4,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
-import Index from "./pages/Index.tsx";
-import Login from "./pages/auth/Login.tsx";
+import Index from "./pages/Index";
+import Login from "./pages/auth/Login";
 import RegisterPage from "./pages/auth/RegisterPage";
-import HowItWorksPage from "./components/HowItworksPage.tsx";
-import ForStudents from "./components/ForStudents.tsx";
-import ForCompanies from "./components/ForCompanies.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import HowItWorksPage from "./components/HowItworksPage";
+import ForStudents from "./components/ForStudents";
+import ForCompanies from "./components/ForCompanies";
+import NotFound from "./pages/NotFound";
 
 // Student pages
-import Bookmarks from "./pages/BookmarksList.tsx";
-import StudentApplications from "./pages/ApplicationList.tsx";
+import Bookmarks from "./pages/BookmarksList";
+import StudentApplications from "./pages/ApplicationList";
 
 // Recruiter pages
 
