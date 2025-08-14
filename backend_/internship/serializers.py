@@ -6,16 +6,63 @@ from rest_framework.response import Response
 # --------------------------
 # PROFILE SERIALIZERS
 # --------------------------
+from rest_framework import serializers
+from .models import Profile
+from .supabase_storage import get_public_url  # your Supabase helper
+
+from .supabase_storage import get_public_url  # your helper function
+
 class ProfileSerializer(serializers.ModelSerializer):
+    profile_picture_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Profile
-        fields = ['first_name', 'last_name', 'profile_picture', 'bio', 'location', 'role']
+        fields = ['first_name', 'last_name', 'bio', 'location', 'role', 'profile_picture_url']
+    def get_profile_picture_url(self, obj):
+        return obj.profile_picture_url or None
+
+
+
+
+
+import uuid
+from rest_framework import serializers
+from .models import Profile
+from .supabase_storage import upload_file, get_public_url
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['first_name', 'last_name', 'profile_picture', 'bio', 'location', 'role']
+        fields = ['first_name', 'last_name', 'bio', 'location']
         read_only_fields = ['role']
+
+    def update(self, instance, validated_data):
+        # Update fields
+        for attr in ['first_name', 'last_name', 'bio', 'location']:
+            if attr in validated_data:
+                setattr(instance, attr, validated_data[attr])
+
+        # Handle profile picture
+        request = self.context.get('request')
+        if request and hasattr(request, 'FILES') and 'profile_picture' in request.FILES:
+            profile_pic = request.FILES['profile_picture']
+            bucket_name = "profile_pics"
+            
+            # unique file name
+            file_ext = profile_pic.name.split('.')[-1]
+            file_path = f"{instance.user.id}/{uuid.uuid4()}.{file_ext}"
+            
+            upload_file(bucket_name, file_path, profile_pic)
+            instance.profile_picture_url = get_public_url(bucket_name, file_path)
+
+
+        instance.save()
+        return instance
+
+
+
+
+
 
 # --------------------------
 # USER SERIALIZERS

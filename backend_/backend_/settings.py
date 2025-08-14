@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,6 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-o3aib*)^rc(fwonof1pwlwxr*h-^7p#gl0op_5b&eim=ot#vat'
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -119,12 +122,36 @@ WSGI_APPLICATION = 'backend_.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import os
+
+import os
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',  # database name from URL
+        'USER': 'postgres.lbbeiuxbcnrwfgyboabz',  # full Supabase username
+        'PASSWORD': config('SUPABASE_DB_PASSWORD'),
+        'HOST': 'aws-0-us-east-2.pooler.supabase.com',
+        'PORT': '6543',  # pooler port
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+    },
+    'migrate': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres.lbbeiuxbcnrwfgyboabz',  # full Supabase username
+        'PASSWORD': config('SUPABASE_DB_PASSWORD'),
+        'HOST': 'aws-0-us-east-2.pooler.supabase.com',
+        'PORT': '5432',  # direct connection for migrations
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
+
+
 
 
 # Password validation

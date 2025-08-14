@@ -61,16 +61,24 @@ class UserProfileView(APIView):
         return Response(serializer.data)
 
 
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import ProfileUpdateSerializer, ProfileSerializer
+
 class ProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request):
         profile = request.user.profile
-        serializer = ProfileUpdateSerializer(profile, data=request.data, partial=True)
+        serializer = ProfileUpdateSerializer(profile, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            # Return the updated profile with public URL
+            return Response(ProfileSerializer(profile).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class UserUpdateView(APIView):
