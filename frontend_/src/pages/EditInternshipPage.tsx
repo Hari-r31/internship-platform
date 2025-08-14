@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import Navbar from "../components/Navbar"; // Added Navbar
 
 export default function EditInternshipPage() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export default function EditInternshipPage() {
     status: "open",
   });
 
+  const [originalData, setOriginalData] = useState(form); // store original fetched data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -39,13 +41,21 @@ export default function EditInternshipPage() {
           expiry_date: data.expiry_date || "",
           status: data.status,
         });
+        setOriginalData({
+          title: data.title,
+          description: data.description,
+          company: data.company,
+          location: data.location,
+          stipend: data.stipend,
+          internship_type: data.internship_type,
+          apply_link: data.apply_link,
+          expiry_date: data.expiry_date || "",
+          status: data.status,
+        });
       } catch (_) {
         setError("Failed to load internship.");
       } finally {
         setLoading(false);
-        if (loading) {
-          console.log("Data is loading...");
-        }
       }
     };
 
@@ -61,7 +71,7 @@ export default function EditInternshipPage() {
       const formattedData = {
         ...form,
         expiry_date: form.expiry_date
-          ? new Date(form.expiry_date).toISOString().split("T")[0] // always YYYY-MM-DD
+          ? new Date(form.expiry_date).toISOString().split("T")[0] // YYYY-MM-DD
           : null,
       };
 
@@ -81,11 +91,27 @@ export default function EditInternshipPage() {
     }
   };
 
+  const handleDiscard = () => {
+    setForm(originalData); // Reset form to original data
+  };
+
+  const handleBack = () => {
+    navigate(-1); // Go back to previous page
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white px-6 py-12">
+      <Navbar /> {/* Navbar added */}
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Edit Internship</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold">Edit Internship</h1>
+          <button
+            onClick={handleBack}
+            className="bg-gray-700 px-4 py-2 rounded hover:bg-gray-800"
+          >
+            ← Back
+          </button>
+        </div>
 
         {error && <p className="text-red-400 mb-4">{error}</p>}
         {success && <p className="text-green-400 mb-4">Internship updated successfully!</p>}
@@ -165,12 +191,20 @@ export default function EditInternshipPage() {
           className="bg-gray-800 text-white px-4 py-2 rounded w-full h-32 mt-4"
         />
 
-        <button
-          onClick={handleSubmit}
-          className="mt-6 bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-        >
-          Save Changes
-        </button>
+        <div className="flex gap-4 mt-6">
+          <button
+            onClick={handleSubmit}
+            className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+          >
+            Save Changes
+          </button>
+          <button
+            onClick={handleDiscard}
+            className="bg-gray-600 text-white px-6 py-2 rounded hover:bg-gray-700"
+          >
+            Discard
+          </button>
+        </div>
       </div>
     </div>
   );
