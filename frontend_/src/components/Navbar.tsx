@@ -20,9 +20,15 @@ export default function Navbar() {
 
   const commonLinks = (
     <>
-      <a href="/For-Students/" className="hover:text-blue-600">Student Opportunities</a>
-      <a href="/For-Companies/" className="hover:text-blue-600">Hire Engineers</a>
-      <a href="/How-It-Works/" className="hover:text-blue-600">Platform Overview</a>
+      <Link to="/For-Students/" className="hover:text-blue-600">
+        Student Opportunities
+      </Link>
+      <Link to="/For-Companies/" className="hover:text-blue-600">
+        Hire Engineers
+      </Link>
+      <Link to="/How-It-Works/" className="hover:text-blue-600">
+        Platform Overview
+      </Link>
     </>
   );
 
