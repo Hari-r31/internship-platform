@@ -54,19 +54,12 @@ INSTALLED_APPS = [
         # your app
     'internship',
 
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.github',
-
     'django_filters',
     'django_extensions',
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -96,13 +89,22 @@ REST_FRAMEWORK = {
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # default
-    'allauth.account.auth_backends.AuthenticationBackend',  # allauth
 )
 SITE_ID = 1
 
-ACCOUNT_EMAIL_VERIFICATION = 'none'  # you can change as needed
-ACCOUNT_LOGIN_METHODS = {'username'}
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+
+# settings.py
+
+
+# Use SMTP instead of sendgrid_backend
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.sendgrid.net"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "apikey"  # literally the word "apikey"
+EMAIL_HOST_PASSWORD = config("SENDGRID_API_KEY")  # Use the API key you created
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")  # Verified sender email
+FRONTEND_URL  = config("FRONTEND_URL")  # Verified sender email
 
 
 ROOT_URLCONF = 'backend_.urls'

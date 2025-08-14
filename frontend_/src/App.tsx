@@ -32,6 +32,9 @@ import ChangePassword from "./pages/ChangePassword";
 import InternshipList from "./pages/InternshipsList";
 import InternshipDetail from "./pages/InternshipDetail";
 
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -63,6 +66,9 @@ function App() {
         <Route path="/activity_logs/" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ActivityLogPage /></ProtectedRoute>} />
         <Route path="/me/profile/" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ProfilePage /></ProtectedRoute>} />
         <Route path="/me/change-password" element={<ProtectedRoute allowedRoles={["student", "recruiter"]}><ChangePassword /></ProtectedRoute>} />
+        
+         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
 
         {/* Catch-all */}
         <Route path="*" element={<NotFound />} />

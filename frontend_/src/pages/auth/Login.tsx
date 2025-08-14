@@ -41,35 +41,46 @@ export default function Login() {
           <h1 className="text-3xl font-bold mb-6 text-center">Login</h1>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-gray-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
+  <input
+    type="text"
+    placeholder="Username"
+    value={username}
+    onChange={(e) => setUsername(e.target.value)}
+    className="w-full bg-gray-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+    required
+  />
+  <input
+    type="password"
+    placeholder="Password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    className="w-full bg-gray-700 text-white px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+    required
+  />
 
-            {error && <p className="text-red-400">{error}</p>}
+  {/* Forgot Password Link */}
+  <div className="text-right">
+    <Link
+      to="/forgot-password/"
+      className="text-blue-400 hover:underline text-sm"
+    >
+      Forgot Password?
+    </Link>
+  </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
-          </form>
+  {error && <p className="text-red-400">{error}</p>}
+
+  <button
+    type="submit"
+    disabled={loading}
+    className={`w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition ${
+      loading ? "opacity-50 cursor-not-allowed" : ""
+    }`}
+  >
+    {loading ? "Logging in..." : "Login"}
+  </button>
+</form>
+
 
           <p className="text-sm text-gray-400 mt-6 text-center">
             Don't have an account?{" "}
@@ -77,6 +88,7 @@ export default function Login() {
               Register here
             </Link>
           </p>
+          
         </div>
       </div>
     </div>

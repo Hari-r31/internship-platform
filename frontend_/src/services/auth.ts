@@ -45,3 +45,15 @@ export async function logout() {
   const { data } = await api.post('/api/logout/');
   return data;
 }
+
+// Request password reset
+export async function forgotPassword(payload: { email: string }) {
+  const { data } = await api.post('/forgot-password/', payload);
+  return data;
+}
+
+// Reset password
+export async function resetPassword(payload: { password: string }, uid: number, token: string) {
+  const { data } = await api.post(`/reset-password/${uid}/${token}/`, payload);
+  return data;
+}
