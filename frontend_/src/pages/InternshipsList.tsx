@@ -5,30 +5,26 @@ import Navbar from "../components/Navbar";
 import api from "../services/api";
 
 export default function InternshipList() {
-
   type Internship = {
-  id: number;
-  title: string;
-  description: string;
-  company: string;
-  location: string;
-  stipend?: number | null;
-  internship_type: string;
-  apply_link?: string | null;
-  posted_on: string; // ISO date string from backend
-  status: "open" | "closed" | "archived";
-  expiry_date?: string | null;
-  recruiter: {
     id: number;
-    username: string;
-    // add other recruiter fields if needed
+    title: string;
+    description: string;
+    company: string;
+    location: string;
+    stipend?: number | null;
+    internship_type: string;
+    apply_link?: string | null;
+    posted_on: string;
+    status: "open" | "closed" | "archived";
+    expiry_date?: string | null;
+    recruiter: {
+      id: number;
+      username: string;
+    };
   };
-};
 
-const [internships, setInternships] = useState<Internship[]>([]);
-
+  const [internships, setInternships] = useState<Internship[]>([]);
   const { loading: authLoading } = useAuth();
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState({
@@ -40,13 +36,28 @@ const [internships, setInternships] = useState<Internship[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const PAGE_SIZE = 10; // must match DRF PAGE_SIZE
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [filters]);
+
   useEffect(() => {
     const fetchInternships = async () => {
       setLoading(true);
+      setError("");
       try {
-        const { data } = await api.get(`/internships/?page=${page}`);
+        const query = new URLSearchParams({
+          page: page.toString(),
+          location: filters.location,
+          internship_type: filters.internship_type,
+          status: filters.status,
+        }).toString();
+
+        const { data } = await api.get(`/internships/?${query}`);
         setInternships(data.results || []);
-        setTotalPages(data.total_pages || 1);
+        setTotalPages(Math.ceil((data.count || 0) / PAGE_SIZE));
       } catch (err) {
         console.error(err);
         setError("Failed to load internships.");
@@ -56,19 +67,10 @@ const [internships, setInternships] = useState<Internship[]>([]);
     };
 
     fetchInternships();
-  }, [page]);
-
-  // Filter by model fields
-  const filtered = internships.filter(i => {
-    return (
-      (!filters.location || i.location?.toLowerCase().includes(filters.location.toLowerCase())) &&
-      (!filters.internship_type || i.internship_type?.toLowerCase().includes(filters.internship_type.toLowerCase())) &&
-      (!filters.status || i.status?.toLowerCase().includes(filters.status.toLowerCase()))
-    );
-  });
+  }, [page, filters]);
 
   // Sort by posted_on
-  const sorted = [...filtered].sort((a, b) => {
+  const sorted = [...internships].sort((a, b) => {
     const dateA = new Date(a.posted_on).getTime();
     const dateB = new Date(b.posted_on).getTime();
     return sortByDate === "newest" ? dateB - dateA : dateA - dateB;
@@ -142,9 +144,21 @@ const [internships, setInternships] = useState<Internship[]>([]);
 
         {/* Pagination */}
         <div className="mt-8 flex justify-center gap-4">
-          <button disabled={page === 1} onClick={() => setPage(page - 1)} className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-50">Previous</button>
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
           <span className="text-white">Page {page} of {totalPages}</span>
-          <button disabled={page === totalPages} onClick={() => setPage(page + 1)} className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-50">Next</button>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+            className="px-4 py-2 bg-gray-800 text-white rounded disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
 
